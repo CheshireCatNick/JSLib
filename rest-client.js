@@ -8,18 +8,7 @@ const http = require('http');
 class RestClient {
   // return an object if parsed successfully
   // otherwise, it will print raw reponse and return status code
-  _makeRequest(method, host, port, path, dataStr, callback) {
-    console.log(token);
-    const option = {
-      host: host,
-      port: port,
-      path: path,
-      headers: {
-        'Content-Type': RestClient.contentType,
-        'Content-Length': dataStr.length
-      },
-      method: method
-    }
+  _makeRequest(option, dataStr, callback) {
     let req = http.request(option, (res) => {
       let result = '';
       res.on('data', (data) => {
@@ -41,15 +30,59 @@ class RestClient {
     req.end();
   }
   get(host, port, path, callback) {
-    this._makeRequest('GET', host, port, path, '', callback);
+    const option = {
+      host: host,
+      port: port,
+      path: path,
+      headers: {
+        'Content-Type': RestClient.contentType,
+        'Content-Length': 0
+      },
+      method: 'GET'
+    };
+    this._makeRequest(option, '', callback);
   }
   put(host, port, path, data, callback) {
     let dataStr = JSON.stringify(data);
-    this._makeRequest('PUT', host, port, path, dataStr, callback);
+    const option = {
+      host: host,
+      port: port,
+      path: path,
+      headers: {
+        'Content-Type': RestClient.contentType,
+        'Content-Length': dataStr.length
+      },
+      method: 'PUT'
+    }
+    this._makeRequest(option, dataStr, callback);
   }
   post(host, port, path, data, callback) {
     let dataStr = JSON.stringify(data);
-    this._makeRequest('POST', host, port, path, dataStr, callback);
+    const option = {
+      host: host,
+      port: port,
+      path: path,
+      headers: {
+        'Content-Type': RestClient.contentType,
+        'Content-Length': dataStr.length
+      },
+      method: 'POST'
+    }
+    this._makeRequest(option, dataStr, callback);
+  }
+  getWToken(host, port, path, token, callback) {
+    const option = {
+      host: host,
+      port: port,
+      path: path,
+      headers: {
+        'Content-Type': RestClient.contentType,
+        'Content-Length': 0,
+        'x-user-token': token
+      },
+      method: 'GET'
+    };
+    this._makeRequest(option, '', callback);
   }
   constructor() {
   }
