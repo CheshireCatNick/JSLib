@@ -1,91 +1,77 @@
-"use strict";
+'use strict';
 /**
- * @description: Restful API client (JSON)
- * @author: Nicky
- */
+* @description: Restful API client (JSON)
+* @author: Nicky
+*/
 const Debug = require('./debug');
-const http = require('http');
+const https = require('https');
+const TAG = 'RestClient';
 class RestClient {
-  // return an object if parsed successfully
-  // otherwise, it will print raw reponse and return status code
-  _makeRequest(option, dataStr, callback) {
-    let req = http.request(option, (res) => {
-      let result = '';
-      res.on('data', (data) => {
-        result += data;
-      });
-      res.on('end', () => {
-        try {
-          const obj = JSON.parse(result);
-          callback(obj);
-        }
-        catch (err) {
-          Debug.warning(['RestClient', 'Parse JSON failed', 'raw response is printed']);
-          Debug.warning(['Raw response', result]);
-          callback(res.statusCode);
-        }
-      });
-    });
-    if (dataStr.length > 0) req.write(dataStr);
-    req.end();
-  }
-  get(host, port, path, callback) {
-    const option = {
-      host: host,
-      port: port,
-      path: path,
-      headers: {
-        'Content-Type': RestClient.contentType,
-        'Content-Length': 0
-      },
-      method: 'GET'
-    };
-    this._makeRequest(option, '', callback);
-  }
-  put(host, port, path, data, callback) {
-    let dataStr = JSON.stringify(data);
-    const option = {
-      host: host,
-      port: port,
-      path: path,
-      headers: {
-        'Content-Type': RestClient.contentType,
-        'Content-Length': dataStr.length
-      },
-      method: 'PUT'
+    // return an object if parsed successfully
+    // otherwise, it will print raw reponse and return status code
+    _makeRequest(option, dataStr) {
+        return new Promise((resolve, reject) => {
+            let req = https.request(option, (res) => {
+                let result = '';
+                res.on('data', (data) => {
+                    result += data;
+                });
+                res.on('end', () => {
+                    try {
+                        const obj = JSON.parse(result);
+                        resolve(obj);
+                    }
+                    catch (err) {
+                        Debug.warning([TAG, 'Parse JSON failed', 'raw response is printed']);
+                        Debug.warning(['Raw response', result]);
+                        Debug.warning(['Error is', err]);
+                        reject(res.statusCode);
+                    }
+                });
+            });
+            if (dataStr.length > 0) req.write(dataStr);
+            req.on('error', (err) => {
+                console.log(err);
+            });
+            req.end();
+        });
     }
-    this._makeRequest(option, dataStr, callback);
-  }
-  post(host, port, path, data, callback) {
-    let dataStr = JSON.stringify(data);
-    const option = {
-      host: host,
-      port: port,
-      path: path,
-      headers: {
-        'Content-Type': RestClient.contentType,
-        'Content-Length': dataStr.length
-      },
-      method: 'POST'
+    get(path, header) {
+        const option = {
+            host: this.host,
+            port: this.port,
+            path: path,
+            headers: Object.assign({}, RestClient.getHeader, header),
+            method: 'GET'
+        };
+        return this._makeRequest(option, '');
     }
-    this._makeRequest(option, dataStr, callback);
-  }
-  getWToken(host, port, path, token, callback) {
-    const option = {
-      host: host,
-      port: port,
-      path: path,
-      headers: {
-        'Content-Type': RestClient.contentType,
-        'Content-Length': 0,
-        'x-user-token': token
-      },
-      method: 'GET'
-    };
-    this._makeRequest(option, '', callback);
-  }
-  constructor() {
-  }
+    post(path, header, data) {
+        let dataStr = JSON.stringify(data);
+        const option = {
+            host: this.host,
+            port: this.port,
+            path: path,
+            headers: Object.assign({}, RestClient.postHeader, header),
+            method: 'POST'
+        }
+        return this._makeRequest(option, dataStr);
+    }
+    constructor(host, port) {
+        this.host = host;
+        this.port = port;
+    }
 }
-RestClient.contentType = 'application/json';
+RestClient.commonHeader = {
+    'Content-Type': 'application/json',
+    'Origin': '',
+    'Connection': 'keep-alive'  
+};
+RestClient.getHeader = Object.assign({}, 
+    RestClient.commonHeader, {
+    'Content-Length': 0
+});
+RestClient.postHeader = Object.assign({}, 
+    RestClient.commonHeader, {
+});
 module.exports = RestClient;

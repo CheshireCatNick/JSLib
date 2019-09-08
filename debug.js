@@ -1,4 +1,8 @@
-"use strict";
+'use strict'
+/**
+ * @description: colorful debug logger
+ * @author: Nicky
+ */
 const operator = {
 	reset: 		"\x1b[0m",
 	bright: 	"\x1b[1m",
@@ -35,6 +39,12 @@ const lvl2Color = {
 class Debug {
 	static printMsg(color, msgArr){
 		let msg = color;
+		// add timestamp
+		// always print +8 timezone
+		const offset = 8;
+		const now = new Date(new Date().getTime() + offset * 3600 * 1000)
+										.toUTCString().replace(/ GMT$/, '');
+		msg += "[" + now + "] ";
 		for (let i = 0; i < msgArr.length - 1; i++)
 			msg += "[" + msgArr[i] + "] ";
 		msg += operator.reset + msgArr[msgArr.length - 1];
