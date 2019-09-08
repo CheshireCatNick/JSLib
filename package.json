@@ -1,0 +1,19 @@
+{
+  "name": "js-lib",
+  "version": "1.0.0",
+  "description": "Some convenient modules for node.js.",
+  "main": "main.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CheshireCatNick/js-lib.git"
+  },
+  "author": "Nicky",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CheshireCatNick/js-lib/issues"
+  },
+  "homepage": "https://github.com/CheshireCatNick/js-lib#readme"
+}
