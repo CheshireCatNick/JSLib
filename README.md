@@ -1,2 +1,2 @@
 # JSLib
-some convenient modules / classes for node.js
+Some convenient modules / classes for node.js.
