@@ -7,5 +7,5 @@ npm install --save CheshireCatNick/js-lib
 ```
 And require each file you need. For example:
 ```
-RestClient = require('js-lib/rest-client');
+const RestClient = require('js-lib/rest-client');
 ```
